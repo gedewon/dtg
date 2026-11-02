@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Flashcards, quizzes and listening practice for the German words used in the practical Class B driving test, with English meanings.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Fahrprüfung">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Driving Test German</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: shadcn/ui (new-york v4) components on the neutral theme. Sticky tabs, one card per mode, primary actions docked at the bottom. The only colour is the road-sign plate (blue question, yellow answer). */
+:root{
+  --radius:.625rem;
+  --background:oklch(1 0 0);
+  --foreground:oklch(.145 0 0);
+  --card:oklch(1 0 0);
+  --primary:oklch(.205 0 0);
+  --primary-foreground:oklch(.985 0 0);
+  --secondary:oklch(.97 0 0);
+  --muted:oklch(.97 0 0);
+  --muted-foreground:oklch(.556 0 0);
+  --accent:oklch(.97 0 0);
+  --border:oklch(.922 0 0);
+  --input:oklch(.922 0 0);
+  --ring:oklch(.708 0 0);
+  --destructive:oklch(.577 .245 27.325);
+  --success:oklch(.55 .14 152);
+  --success-soft:oklch(.96 .04 152);
+  --destructive-soft:oklch(.97 .03 27);
+  --sign-blue:#11589F;
+  --sign-yellow:#FFC72C;
+  --on-blue:#FFFFFF;
+  --on-yellow:#14171C;
+  --f-ui:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-sign:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --background:oklch(.145 0 0); --foreground:oklch(.985 0 0); --card:oklch(.205 0 0);
+    --primary:oklch(.922 0 0); --primary-foreground:oklch(.205 0 0); --secondary:oklch(.269 0 0);
+    --muted:oklch(.269 0 0); --muted-foreground:oklch(.708 0 0); --accent:oklch(.269 0 0);
+    --border:oklch(1 0 0 / 10%); --input:oklch(1 0 0 / 15%); --ring:oklch(.556 0 0);
+    --destructive:oklch(.704 .191 22.216); --success:oklch(.72 .16 152);
+    --success-soft:oklch(.3 .06 152); --destructive-soft:oklch(.3 .07 25);
+    --sign-blue:#1F67B4; --sign-yellow:#F4BE2B; --on-blue:#FFFFFF; --on-yellow:#14171C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --background:oklch(.145 0 0); --foreground:oklch(.985 0 0); --card:oklch(.205 0 0);
+  --primary:oklch(.922 0 0); --primary-foreground:oklch(.205 0 0); --secondary:oklch(.269 0 0);
+  --muted:oklch(.269 0 0); --muted-foreground:oklch(.708 0 0); --accent:oklch(.269 0 0);
+  --border:oklch(1 0 0 / 10%); --input:oklch(1 0 0 / 15%); --ring:oklch(.556 0 0);
+  --destructive:oklch(.704 .191 22.216); --success:oklch(.72 .16 152);
+  --success-soft:oklch(.3 .06 152); --destructive-soft:oklch(.3 .07 25);
+  --sign-blue:#1F67B4; --sign-yellow:#F4BE2B; --on-blue:#FFFFFF; --on-yellow:#14171C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--background);color:var(--foreground);font-family:var(--f-ui);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--background)}
+button,input{font:inherit;color:inherit}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:640px;margin:0 auto}
+.muted{color:var(--muted-foreground)}
+:focus-visible{outline:none}
+
+/* Button (shadcn) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border-radius:calc(var(--radius) - 2px);font-size:15px;font-weight:500;height:40px;padding:0 16px;border:1px solid transparent;cursor:pointer;transition:background-color .15s,color .15s,border-color .15s,box-shadow .15s;outline:none}
+.btn:focus-visible,.tab:focus-visible,.tg button:focus-visible,.opt:focus-visible,.plate:focus-visible,.check:focus-within,.input:focus-visible,.collapse-trigger:focus-visible,.linkbtn:focus-visible{border-color:var(--ring);box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 50%,transparent)}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn-default{background:var(--primary);color:var(--primary-foreground)}
+@media (hover:hover){.btn-default:hover{background:color-mix(in oklab,var(--primary) 90%,transparent)}}
+.btn-outline{background:var(--background);border-color:var(--border);box-shadow:0 1px 2px rgb(0 0 0 / .05)}
+:root:not([data-theme="light"]) .btn-outline{background:var(--background)}
+@media (hover:hover){.btn-outline:hover,.btn-ghost:hover{background:var(--accent)}}
+.btn-ghost{background:transparent}
+.btn-success{background:var(--success);color:#fff}
+.btn-destructive-outline{background:var(--background);border-color:color-mix(in oklab,var(--destructive) 45%,transparent);color:var(--destructive)}
+.btn-destructive{background:var(--destructive);color:#fff}
+.btn-icon{width:40px;padding:0}
+.btn-lg{height:48px;font-size:16px}
+kbd{font-family:var(--f-ui);font-size:11px;font-weight:500;min-width:20px;height:20px;padding:0 5px;border-radius:4px;display:inline-grid;place-items:center;background:color-mix(in oklab,currentColor 14%,transparent);opacity:.8}
+@media (hover:none){kbd{display:none}}
+
+/* Badge (shadcn) */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:calc(var(--radius) - 2px);border:1px solid var(--border);padding:2px 8px;font-size:12px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.badge-secondary{background:var(--secondary);border-color:transparent}
+
+/* Card (shadcn) */
+.card{display:flex;flex-direction:column;gap:18px;background:var(--card);color:var(--foreground);border:1px solid var(--border);border-radius:calc(var(--radius) + 4px);padding-block:20px;box-shadow:0 1px 2px rgb(0 0 0 / .05)}
+.card-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding-inline:20px}
+.card-title{font-weight:600;line-height:1.2;font-size:16px}
+.card-desc{font-size:14px;color:var(--muted-foreground);grid-column:1}
+.card-action{grid-column:2;grid-row:1 / span 2;display:flex;align-items:center;gap:8px;align-self:center}
+.card-content{padding-inline:20px}
+.card-footer{padding-inline:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* Header */
+.site-head{padding-block:22px 6px}
+.head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+h1{font-size:clamp(22px,5.4vw,28px);font-weight:600;letter-spacing:-.02em;line-height:1.15;margin:0}
+.desc{margin:4px 0 0;color:var(--muted-foreground);font-size:14px}
+.progress{position:relative;display:flex;height:8px;border-radius:999px;overflow:hidden;background:color-mix(in oklab,var(--primary) 12%,transparent);margin-top:16px}
+.progress i{display:block;height:100%;transition:width .3s}
+.progress .k{background:var(--primary)}
+.progress .l{background:color-mix(in oklab,var(--primary) 40%,transparent)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--muted-foreground);font-variant-numeric:tabular-nums}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* Tabs (shadcn) */
+.tabs-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in oklab,var(--background) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding-block:10px}
+.tabs{display:flex;width:100%;height:44px;padding:3px;border-radius:var(--radius);background:var(--muted);color:var(--muted-foreground)}
+.tab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;background:transparent;border-radius:calc(var(--radius) - 2px);font-size:15px;font-weight:500;cursor:pointer;color:color-mix(in oklab,var(--foreground) 60%,transparent);transition:all .15s;outline:none}
+.tab[aria-selected="true"]{background:var(--background);color:var(--foreground);box-shadow:0 1px 3px rgb(0 0 0 / .1)}
+:root:not([data-theme="light"]) .tab[aria-selected="true"]{border-color:transparent}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab[aria-selected="true"]{background:var(--input);border-color:var(--input)}}
+:root[data-theme="dark"] .tab[aria-selected="true"]{background:var(--input);border-color:var(--input)}
+.tab svg.i{width:16px;height:16px}
+
+/* Toggle group (shadcn outline) */
+.tg{display:inline-flex;border-radius:calc(var(--radius) - 2px);box-shadow:0 1px 2px rgb(0 0 0 / .05)}
+.tg button{height:36px;padding:0 12px;border:1px solid var(--border);border-left-width:0;background:transparent;font-size:14px;font-weight:500;cursor:pointer;color:var(--muted-foreground);outline:none}
+.tg button:first-child{border-left-width:1px;border-radius:calc(var(--radius) - 2px) 0 0 calc(var(--radius) - 2px)}
+.tg button:last-child{border-radius:0 calc(var(--radius) - 2px) calc(var(--radius) - 2px) 0}
+.tg button[aria-pressed="true"]{background:var(--accent);color:var(--foreground)}
+.opts-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:14px;color:var(--muted-foreground)}
+
+/* Collapsible section picker with checkboxes */
+.collapse{margin-top:6px;margin-bottom:12px}
+.collapse-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:calc(var(--radius) - 2px);background:var(--background);cursor:pointer;text-align:left;outline:none}
+.collapse-trigger .t{min-width:0;font-size:14px;color:var(--muted-foreground)}
+.collapse-trigger .t strong{color:var(--foreground);font-weight:500}
+.collapse-trigger svg{transition:transform .2s}
+.collapse-trigger[aria-expanded="true"] svg{transform:rotate(180deg)}
+.collapse-body{border:1px solid var(--border);border-top:0;border-radius:0 0 calc(var(--radius) - 2px) calc(var(--radius) - 2px);margin-top:-4px;padding:10px 6px 6px}
+.collapse-trigger[aria-expanded="true"]{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.check{position:relative;display:flex;align-items:center;gap:12px;min-height:44px;padding:4px 8px;border-radius:calc(var(--radius) - 2px);cursor:pointer;border:1px solid transparent}
+@media (hover:hover){.check:hover{background:var(--accent)}}
+.check input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.check .box{flex:none;width:18px;height:18px;border-radius:4px;border:1px solid var(--input);background:var(--background);display:grid;place-items:center;box-shadow:0 1px 2px rgb(0 0 0 / .05)}
+:root:not([data-theme="light"]) .check .box{border-color:color-mix(in oklab,var(--foreground) 25%,transparent)}
+.check .box svg{width:13px;height:13px;stroke-width:3;opacity:0}
+.check input:checked + .box{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground)}
+.check input:checked + .box svg{opacity:1}
+.check .name{flex:1;min-width:0;font-size:15px}
+.check .name small{display:block;color:var(--muted-foreground);font-size:13px;line-height:1.3}
+.collapse-foot{display:flex;justify-content:flex-end;padding:6px 8px 2px}
+.linkbtn{border:1px solid transparent;background:none;color:var(--foreground);font-size:14px;font-weight:500;text-decoration:underline;text-underline-offset:4px;cursor:pointer;padding:6px 4px;border-radius:6px;outline:none}
+
+/* Level dots */
+.dots{display:inline-flex;gap:4px;align-items:center}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--border)}
+:root:not([data-theme="light"]) .dots i{background:color-mix(in oklab,var(--foreground) 18%,transparent)}
+.dots i.on{background:var(--success)!important}
+
+/* Road-sign plate */
+.plate{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;width:100%;min-height:clamp(200px,34vh,280px);padding:30px 22px;border:1px solid transparent;border-radius:12px;cursor:pointer;text-align:center;outline:none;
+  background:var(--sign-blue);color:var(--on-blue);box-shadow:inset 0 0 0 6px var(--sign-blue),inset 0 0 0 9px var(--on-blue)}
+.plate.is-back{background:var(--sign-yellow);color:var(--on-yellow);box-shadow:inset 0 0 0 6px var(--sign-yellow),inset 0 0 0 9px var(--on-yellow)}
+.plate:focus-visible{box-shadow:inset 0 0 0 6px var(--sign-blue),inset 0 0 0 9px var(--on-blue),0 0 0 3px color-mix(in oklab,var(--ring) 60%,transparent)}
+.plate.is-back:focus-visible{box-shadow:inset 0 0 0 6px var(--sign-yellow),inset 0 0 0 9px var(--on-yellow),0 0 0 3px color-mix(in oklab,var(--ring) 60%,transparent)}
+.plate.flip-in{animation:flip .22s ease-out}
+@keyframes flip{from{transform:perspective(800px) rotateX(-12deg);opacity:.6}to{transform:none;opacity:1}}
+.plate-main{font-family:var(--f-sign);font-weight:700;font-size:clamp(30px,7.6vw,46px);line-height:1.06;text-wrap:balance;overflow-wrap:anywhere;hyphens:auto;max-width:100%}
+.plate-sub{font-size:15px;opacity:.85;max-width:40ch}
+.plate-hint{font-size:14px;max-width:40ch;border-top:1.5px solid currentColor;padding-top:12px;margin-top:2px}
+.plate.compact{min-height:clamp(140px,22vh,190px);cursor:default}
+
+/* Quiz */
+.qprogress{height:6px;border-radius:999px;overflow:hidden;background:color-mix(in oklab,var(--primary) 12%,transparent);margin-inline:20px}
+.qprogress i{display:block;height:100%;background:var(--primary);transition:width .25s}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:10px 12px;text-align:left;border:1px solid var(--border);background:var(--background);border-radius:calc(var(--radius) - 2px);cursor:pointer;font-size:15px;box-shadow:0 1px 2px rgb(0 0 0 / .05);transition:background-color .15s,border-color .15s;outline:none}
+@media (hover:hover){.opt:hover:not([disabled]){background:var(--accent)}}
+.opt .k{flex:none;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:600;background:var(--muted);color:var(--muted-foreground)}
+.opt .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.opt .mark{flex:none;display:none}
+.opt.is-correct{border-color:var(--success);background:var(--success-soft)}
+.opt.is-correct .k{background:var(--success);color:#fff}
+.opt.is-correct .mark{display:block;color:var(--success)}
+.opt.is-wrong{border-color:var(--destructive);background:var(--destructive-soft)}
+.opt.is-wrong .k{background:var(--destructive);color:#fff}
+.opt.is-wrong .mark{display:block;color:var(--destructive)}
+.opt[disabled]{cursor:default}
+.opt.dim{opacity:.5}
+
+/* Alert (shadcn) */
+.alert{scroll-margin-bottom:100px;display:grid;grid-template-columns:16px minmax(0,1fr);gap:2px 12px;align-items:start;margin-top:14px;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);font-size:14px}
+.alert svg{margin-top:2px}
+.alert .a-title{font-weight:600;font-size:15px;line-height:1.4}
+.alert .a-desc{grid-column:2;color:var(--muted-foreground)}
+.alert .a-desc .de{color:var(--foreground);font-weight:500}
+.alert.good svg,.alert.good .a-title{color:var(--success)}
+.alert.bad svg,.alert.bad .a-title{color:var(--destructive)}
+
+.play{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:clamp(160px,24vh,210px);padding:22px 16px;border-radius:12px;background:var(--sign-blue);color:var(--on-blue);box-shadow:inset 0 0 0 6px var(--sign-blue),inset 0 0 0 9px var(--on-blue);text-align:center}
+.play .big{width:76px;height:76px;border-radius:50%;border:0;background:var(--on-blue);color:var(--sign-blue);display:grid;place-items:center;cursor:pointer;outline:none}
+.play .big:focus-visible{box-shadow:0 0 0 4px color-mix(in oklab,var(--on-blue) 50%,transparent)}
+.play .big svg.i{width:32px;height:32px}
+.play .reveal{border:0;background:none;color:var(--on-blue);text-decoration:underline;text-underline-offset:4px;cursor:pointer;font-size:14px;padding:6px}
+.play .said{font-family:var(--f-sign);font-weight:700;font-size:28px;line-height:1.1;overflow-wrap:anywhere;max-width:100%}
+.empty-note{padding:16px;border-radius:var(--radius);border:1px dashed var(--border);color:var(--muted-foreground)}
+
+.score{font-size:56px;font-weight:600;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.score span{font-size:24px;color:var(--muted-foreground);font-weight:500}
+.missed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.missed li{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border)}
+.missed .txt{flex:1;min-width:0}
+.missed strong{display:block;font-weight:500}
+.missed span{color:var(--muted-foreground);font-size:14px}
+
+/* Word list */
+.input-wrap{position:relative}
+.input-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-foreground)}
+.input{width:100%;height:44px;padding:0 12px 0 36px;border-radius:calc(var(--radius) - 2px);border:1px solid var(--input);background:transparent;font-size:16px;box-shadow:0 1px 2px rgb(0 0 0 / .05);outline:none}
+:root:not([data-theme="light"]) .input{background:color-mix(in oklab,var(--input) 30%,transparent)}
+.input::placeholder{color:var(--muted-foreground)}
+.sec-h{display:flex;align-items:baseline;gap:8px;margin:20px 0 2px;font-size:16px;font-weight:600}
+.sec-h small{font-weight:400;font-size:13px;color:var(--muted-foreground);min-width:0}
+.row{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--border)}
+.row:first-of-type{border-top:0}
+.row .txt{flex:1;min-width:0}
+.row .de{font-weight:500;overflow-wrap:anywhere}
+.row .en{color:var(--muted-foreground);font-size:14px}
+.row .dots{flex:none}
+.empty{padding:28px 0;color:var(--muted-foreground);text-align:center}
+
+/* Dock */
+main{padding-block:0 116px}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in oklab,var(--background) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid var(--border);padding-block:10px calc(10px + env(safe-area-inset-bottom,0px))}
+.dock .wrap{display:flex;gap:10px}
+.dock .btn{flex:1}
+.source{font-size:13px;color:var(--muted-foreground);margin:24px 0 0;max-width:62ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+.install{display:inline-flex}
+</style>
+</head>
+<body>
+<header class="site-head gutter">
+  <div class="wrap">
+    <div class="head-row">
+      <div>
+        <h1>Driving Test German</h1>
+        <p class="desc">Words the examiner uses in the practical Class B test</p>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><span class="badge" id="knownBadge">0 / 108 known</span><button class="btn btn-outline install" id="installBtn" hidden style="height:32px;font-size:13px;padding:0 10px">Install app</button></div>
+    </div>
+    <div class="progress" id="bar" role="img"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+</header>
+
+<div class="tabs-bar gutter">
+  <div class="wrap">
+    <nav class="tabs" role="tablist" aria-label="Practice mode">
+      <button class="tab" role="tab" data-mode="cards">Cards</button>
+      <button class="tab" role="tab" data-mode="quiz">Quiz</button>
+      <button class="tab" role="tab" data-mode="listen">Listen</button>
+      <button class="tab" role="tab" data-mode="list">Words</button>
+    </nav>
+  </div>
+</div>
+
+<main class="gutter">
+  <div class="wrap">
+    <div class="collapse">
+      <button class="collapse-trigger" id="secToggle" aria-expanded="false" aria-controls="secBody">
+        <span class="t" id="secSummary"></span>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="collapse-body" id="secBody" hidden>
+        <div id="checks"></div>
+        <div class="collapse-foot"><button class="linkbtn" id="allBtn">Select all</button></div>
+      </div>
+    </div>
+
+    <section id="panel" aria-live="polite"></section>
+
+    <p class="source">From the BVF word list for the practical Class B test (Fahrschule 7/2018). The list is a guide, not every word you might hear. Your progress is saved in this browser only.</p>
+  </div>
+</main>
+
+<div class="dock gutter" id="dock" hidden><div class="wrap" id="dockInner"></div></div>
+
+<script>
+const SECT = {
+  1:{de:"Angabe während der Prüfungsfahrt", en:"Directions"},
+  2:{de:"Manöverangaben", en:"Maneuvers"},
+  3:{de:"Sicherheitskontrolle", en:"Safety check"},
+  4:{de:"Fahrzeugbegriffe", en:"Car parts"},
+  5:{de:"Fahrtechnischer Abschluss", en:"Securing the car"},
+  6:{de:"Abschluss der Prüfung", en:"Test result"}
+};
+
+const RAW = [
+ ["1.1","Links","left","Opposite: rechts (right)"],
+ ["1.2","Rechts","right","Opposite: links (left)"],
+ ["1.3","Nächste Straße (links/rechts)","next street (left/right)","nächste = next, Straße = street"],
+ ["1.4","Halb links/rechts abbiegen","bear left/right","halb = half: a gentle turn, not a full 90°"],
+ ["1.5","Erste, zweite, dritte Straße rechts (Kreisverkehr)","first, second, third street on the right (roundabout)","In a roundabout, count the streets on your right"],
+ ["1.6","Erste, zweite, dritte Ausfahrt nehmen","take the first, second, third exit","Ausfahrt = exit, nehmen = take"],
+ ["1.7","Der Vorfahrtsstraße folgen","follow the priority road","Vorfahrt = right of way. Stay on the main road, even where it bends"],
+ ["1.8","In Richtung … fahren","drive towards …","Richtung = direction. Follow the signs to that place"],
+ ["1.9","Wenn nichts gesagt wird, geht es geradeaus","if nothing is said, go straight ahead","geradeaus = straight ahead"],
+ ["1.10","Richtung Autobahn/Kraftfahrstraße","towards the motorway / expressway","Kraftfahrstraße = fast road for motor vehicles only"],
+ ["2.1","Anhalten","stop (pull over)","halten = hold, stop"],
+ ["2.2","Rückwärts fahren (links/rechts)","reverse (to the left/right)","rückwärts = backwards"],
+ ["2.3","Vorwärts fahren (links/rechts)","drive forwards (to the left/right)","vorwärts = forwards"],
+ ["2.4","Einparken längs/quer (vorwärts/rückwärts)","park parallel / in a bay (forwards/backwards)","längs = along the road (parallel), quer = across (a 90° bay)"],
+ ["2.5","Umkehren","turn around","Usually a turn in a side street or a three-point turn"],
+ ["2.6","Hinter dem Fahrzeug einparken","park behind the vehicle","hinter = behind"],
+ ["2.7","Zwischen Fahrzeugen einparken","park between vehicles","zwischen = between"],
+ ["2.8","Gefahrbremsung/Abbremsen mit höchstmöglicher Verzögerung","emergency stop / brake as hard as possible","Gefahr = danger. Brake fully at once when you hear it"],
+ ["3.1","Funktion prüfen von","check that … works","prüfen = check, test"],
+ ["3.2","Ein- und Ausschalten von","switch … on and off","ein = on, aus = off"],
+ ["3.3","Zeigen von","show / point to","Just point to the part"],
+ ["3.4","Standlicht","parking lights (sidelights)","stehen = stand: the small lights for a standing car"],
+ ["3.5","Abblendlicht","dipped headlights (low beam)","abblenden = to dim"],
+ ["3.6","Fernlicht","full beam (high beam)","fern = far"],
+ ["3.7","Schlussleuchten mit Kennzeichenbeleuchtung","rear lights with number-plate light","Schluss = end, Kennzeichen = number plate"],
+ ["3.8","Nebelschlussleuchte","rear fog light","Nebel = fog"],
+ ["3.9","Warnblinkanlage","hazard lights","warnen = warn, blinken = flash"],
+ ["3.10","Blinker","indicator (turn signal)","blinken = to flash"],
+ ["3.11","Hupe","horn",""],
+ ["3.12","Bremsleuchte(n)","brake light(s)","Bremse = brake, Leuchte = light"],
+ ["3.13","Kontrollleuchten benennen","name the warning lights on the dashboard","benennen = to name"],
+ ["3.14","Rückstrahler","reflectors","zurück = back, strahlen = shine"],
+ ["3.15","Vorhandensein","presence (is it there?)","vorhanden = present, there"],
+ ["3.16","Beschädigung","damage",""],
+ ["3.17","Lenkung","steering","lenken = to steer"],
+ ["3.18","Lenkschloss entriegeln","unlock the steering lock","entriegeln = unlock. Move the wheel a little while turning the key"],
+ ["3.19","Bremsanlage","braking system","Anlage = system"],
+ ["3.20","Betriebsbremse (Fußbremse)","service brake (foot brake)","Fuß = foot"],
+ ["3.21","Feststellbremse","parking brake","feststellen = fix in place. Same thing as Handbremse"],
+ ["3.22","Flüssigkeitsstände prüfen","check the fluid levels","Flüssigkeit = liquid, Stand = level"],
+ ["3.23","Motoröl","engine oil",""],
+ ["3.24","Kühlmittel","coolant","kühlen = to cool"],
+ ["3.25","Scheibenwaschflüssigkeit","windscreen washer fluid","Scheibe = windscreen, waschen = wash"],
+ ["3.26","Reifen kontrollieren","check the tyres","kontrollieren = check (not control)"],
+ ["3.27","Beschädigungen","signs of damage (plural, e.g. on tyres)","Plural of Beschädigung"],
+ ["3.28","Profiltiefe","tread depth","Profil = tread, Tiefe = depth. Legal minimum: 1.6 mm"],
+ ["3.29","Reifendruck","tyre pressure","Druck = pressure"],
+ ["4.1","Sicherheitsgurt","seat belt","Sicherheit = safety, Gurt = belt"],
+ ["4.2","Lenkrad","steering wheel","lenken = steer, Rad = wheel"],
+ ["4.3","Kupplung","clutch","The left pedal in a manual car"],
+ ["4.4","Bremse","brake",""],
+ ["4.5","Handbremse","handbrake","Also called Feststellbremse"],
+ ["4.6","Schalthebel","gear lever","schalten = change gear, Hebel = lever"],
+ ["4.7","Gang / Gänge","gear / gears","erster Gang = first gear"],
+ ["4.8","Scheibenwischer","windscreen wipers","wischen = wipe"],
+ ["4.9","Lichtschalter","light switch","Schalter = switch"],
+ ["4.10","Heizung","heating","heizen = to heat"],
+ ["4.11","Gebläse","fan (blower)","blasen = blow. Used to clear misted windows"],
+ ["4.12","Motorhaube öffnen","open the bonnet (hood)","öffnen = open"],
+ ["4.13","Räder kontrollieren","check the wheels","Rad, Räder = wheel, wheels"],
+ ["4.15","Fenster öffnen/schließen","open/close the window","schließen = close"],
+ ["4.16","Spiegel (einstellen)","(adjust the) mirror","einstellen = adjust, set"],
+ ["4.17","Außenspiegel (einstellen)","(adjust the) side mirror","außen = outside"],
+ ["4.18","Heckscheibenheizung einschalten","switch on the rear window heater","Heck = back of the car"],
+ ["5.1","Sicherung/Sichern gegen","securing (the car) against","sichern = make safe"],
+ ["5.2","Wegrollen","rolling away","weg = away. Use the handbrake and leave it in gear"],
+ ["5.3","Unbefugte Benutzung","unauthorised use","Lock the car and take the key"],
+ ["5.4","Umschau/Umsicht beim Aussteigen","look around carefully when getting out","Look over your shoulder before opening the door"],
+ ["6.1","Prüfung bestanden","test passed","bestehen = to pass"],
+ ["6.2","Prüfung nicht bestanden","test failed","nicht = not"],
+ ["6.3","Erhebliches Fehlverhalten","serious mistake (major fault)","erheblich = serious. One is enough to fail"],
+ ["6.4","Häufung oder Wiederholung von Fehlern","many or repeated mistakes","Wiederholung = repetition"],
+ ["6.5","Grundfahraufgabe wiederholt fehlerhaft","basic maneuver repeatedly done wrong","Grundfahraufgabe = set maneuver, like parking"],
+ ["6.6","Gefährdung","endangering others","Gefahr = danger"],
+ ["6.7","Zu langsam","too slow",""],
+ ["6.8","Zu schnell","too fast",""],
+ ["6.9","Unsicher","unsure, not confident","sicher = sure, safe"],
+ ["6.10","Fehlende Verkehrsbeobachtung bei …","not watching the traffic when …","fehlend = missing, beobachten = observe"],
+ ["6.11","Fehlende oder ungenügende Spiegelbeobachtung","missing or poor mirror checks","ungenügend = not enough"],
+ ["6.12","Fehlendes vorausschauendes Fahren","not driving with anticipation","voraus = ahead, schauen = look"],
+ ["6.13","Zu wenig Abstand beim Vorbeifahren/Überholen von","too little distance when passing/overtaking","Abstand = distance, überholen = overtake"],
+ ["6.14","Motorradfahrer","motorcyclist",""],
+ ["6.15","Radfahrer","cyclist","Rad = bike here"],
+ ["6.16","Fußgänger","pedestrian","Fuß = foot, gehen = walk"],
+ ["6.17","Pkw","car","Personenkraftwagen = passenger car"],
+ ["6.18","Lkw","lorry (truck)","Lastkraftwagen = goods vehicle"],
+ ["6.19","Straßenbahn","tram",""],
+ ["6.20","Vorfahrt/Vorrang nicht beachtet bei","failed to give way at","beachten = pay attention to"],
+ ["6.21","Rechts vor links","traffic from the right goes first","At junctions with no signs"],
+ ["6.22","Vorfahrt gewähren","give way (yield)","The sign: white triangle with red border, point down"],
+ ["6.23","STOP-Schild","stop sign","Schild = sign. Stop completely, wheels still"],
+ ["6.24","Ampel ROT","traffic light red","Ampel = traffic light"],
+ ["6.25","Ampel GELB","traffic light amber (yellow)","gelb = yellow"],
+ ["6.26","Ampel GRÜN","traffic light green","grün = green"],
+ ["6.27","Rechtsabbiegepfeil","green right-turn arrow","With the green arrow sign at red: stop first, then turn carefully"],
+ ["6.28","Kreisverkehr","roundabout","Kreis = circle"],
+ ["6.29","Vorrang Fußgänger","pedestrians have priority","Vorrang = priority"],
+ ["6.30","Nichtbeachten von Verkehrszeichen","ignoring traffic signs","Verkehrszeichen = traffic signs"],
+ ["6.31","Zu schnell an Bus vorbeigefahren","passed a bus too fast","Bus at a stop with hazard lights on: walking speed only"],
+ ["6.32","Verkehrsverbot","no vehicles allowed","Verbot = ban. Sign: white circle, red border"],
+ ["6.33","Verbot der Einfahrt","no entry","Sign: red circle with a white bar"],
+ ["6.34","Überholverbot","no overtaking","Sign: red car next to black car"],
+ ["6.35","Fehler bei Wechsel des Fahrstreifens","mistake when changing lanes","Fahrstreifen = lane, Wechsel = change"],
+ ["6.36","Fehlende Reaktion bei Kindern, Hilfsbedürftigen und älteren Menschen","no reaction to children, people needing help, and older people","Slow down and be ready to brake near them"],
+ ["6.37","Behinderung (vermeidbar)","obstructing others (avoidable)","behindern = to obstruct"],
+ ["6.38","Belästigung (vermeidbar)","disturbing others (avoidable)","e.g. noise or splashing people"],
+ ["6.39","Falsch eingeordnet (Fahrstreifen)","in the wrong lane","falsch = wrong, einordnen = get in lane"],
+ ["6.40","Schädigung","causing damage or injury","Schaden = damage"]
+];
+const TERMS = RAW.map(([id,de,en,hint])=>({id,sec:+id.split(".")[0],de,en,hint}));
+const BY_ID = Object.fromEntries(TERMS.map(t=>[t.id,t]));
+// Terms that mean the same thing are never used as wrong answers for each other
+const SAME = {"3.16":["3.27"],"3.27":["3.16"],"4.5":["3.21"],"3.21":["4.5"],"4.4":["3.20"],"3.20":["4.4"],"1.5":["6.28"],"6.28":["1.5"]};
+
+/* lucide icons */
+const ic = d=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const I = {
+  volume: ic('<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>'),
+  check: ic('<path d="M20 6 9 17l-5-5"/>'),
+  x: ic('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+  search: ic('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
+  redo: ic('<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>'),
+  arrow: ic('<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'),
+  trash: ic('<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>')
+};
+
+/* ---------- storage ---------- */
+const PKEY="dtg-progress-v1", UKEY="dtg-ui-v1";
+function load(k){try{return JSON.parse(localStorage.getItem(k))||null}catch(e){return null}}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+let prog = load(PKEY) || {};
+const ui = Object.assign({secs:[1,2,3,4,5,6],mode:"cards",dir:"de-en",slow:false}, load(UKEY)||{});
+const secs = new Set((ui.secs||[]).filter(s=>SECT[s]));
+if(!secs.size) [1,2,3,4,5,6].forEach(s=>secs.add(s));
+if(!["cards","quiz","listen","list"].includes(ui.mode)) ui.mode="cards";
+function saveUI(){ui.secs=[...secs];store(UKEY,ui)}
+const box = id => prog[id]||0;
+function grade(id,ok){prog[id]= ok?Math.min(4,box(id)+1):0;store(PKEY,prog);renderStats();renderChecks()}
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const active = ()=>TERMS.filter(t=>secs.has(t.sec));
+const prioritized = list=>list.map(t=>({t,k:box(t.id)+Math.random()*1.6})).sort((a,b)=>a.k-b.k).map(x=>x.t);
+const dots = id=>`<span class="dots" role="img" aria-label="Level ${box(id)} of 4">${[1,2,3,4].map(n=>`<i class="${box(id)>=n?"on":""}"></i>`).join("")}</span>`;
+const level = id=>box(id)>=3?"known":box(id)>=1?"learning":"new";
+const reduced = ()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- speech ---------- */
+const synth = window.speechSynthesis;
+let deVoice = null;
+function pickVoice(){try{const v=synth.getVoices();deVoice=v.find(x=>/^de[-_]DE/i.test(x.lang))||v.find(x=>/^de/i.test(x.lang))||null}catch(e){}}
+if(synth){pickVoice();try{synth.addEventListener("voiceschanged",pickVoice)}catch(e){}}
+function speakable(de){
+  return de.replace(/\(n\)/g,"n").replace(/…/g," ").replace(/\s*\/\s*/g," oder ").replace(/[()]/g,", ")
+    .replace(/\bPkw\b/,"P K W").replace(/\bLkw\b/,"L K W").replace("STOP-Schild","Stoppschild")
+    .replace("ROT","rot").replace("GELB","gelb").replace("GRÜN","grün");
+}
+function speak(de){
+  if(!synth) return false;
+  try{synth.cancel();const u=new SpeechSynthesisUtterance(speakable(de));u.lang="de-DE";if(deVoice)u.voice=deVoice;u.rate=ui.slow?0.72:0.95;synth.speak(u);return true}catch(e){return false}
+}
+
+/* ---------- header + sections ---------- */
+function renderStats(){
+  const n=TERMS.length, k=TERMS.filter(t=>level(t.id)==="known").length, l=TERMS.filter(t=>level(t.id)==="learning").length;
+  $("#knownBadge").textContent=`${k} / ${n} known`;
+  const bar=$("#bar");
+  bar.innerHTML=`<i class="k" style="width:${k/n*100}%"></i><i class="l" style="width:${l/n*100}%"></i>`;
+  bar.setAttribute("aria-label",`${k} known, ${l} learning, ${n-k-l} not started`);
+  $("#legend").innerHTML=`<span><b style="background:var(--primary)"></b>${k} known</span><span><b style="background:color-mix(in oklab,var(--primary) 40%,transparent)"></b>${l} learning</span><span><b style="background:color-mix(in oklab,var(--primary) 12%,transparent)"></b>${n-k-l} not started</span>`;
+}
+function renderChecks(){
+  $("#checks").innerHTML=Object.entries(SECT).map(([s,o])=>{
+    const ts=TERMS.filter(t=>t.sec==+s), k=ts.filter(t=>level(t.id)==="known").length;
+    return `<label class="check"><input type="checkbox" data-sec="${s}" ${secs.has(+s)?"checked":""}><span class="box">${I.check}</span><span class="name">${o.en}<small lang="de">${o.de}</small></span><span class="badge badge-secondary">${k} / ${ts.length}</span></label>`;
+  }).join("");
+  $("#allBtn").textContent = secs.size===6 ? "Clear all" : "Select all";
+  const names=[...secs].sort((a,b)=>a-b).map(s=>SECT[s].en);
+  $("#secSummary").innerHTML = secs.size===6 ? `Practising <strong>all sections</strong>` : `Practising <strong>${esc(names.join(", "))}</strong>`;
+}
+$("#secToggle").addEventListener("click",()=>{
+  const open=$("#secBody").hidden;
+  $("#secBody").hidden=!open;
+  $("#secToggle").setAttribute("aria-expanded",open);
+});
+$("#checks").addEventListener("change",e=>{
+  const cb=e.target.closest("input[data-sec]"); if(!cb) return;
+  const s=+cb.dataset.sec;
+  if(cb.checked) secs.add(s);
+  else if(secs.size>1) secs.delete(s);
+  else { cb.checked=true; return; }
+  resetRounds(); saveUI(); renderChecks(); renderPanel();
+  const again=$(`#checks input[data-sec="${s}"]`); if(again) again.focus();
+});
+$("#allBtn").addEventListener("click",()=>{
+  if(secs.size===6){secs.clear();secs.add(1)} else [1,2,3,4,5,6].forEach(s=>secs.add(s));
+  resetRounds(); saveUI(); renderChecks(); renderPanel();
+});
+
+/* ---------- tabs ---------- */
+const tabs=[...document.querySelectorAll(".tab")];
+tabs.forEach(t=>t.addEventListener("click",()=>setMode(t.dataset.mode)));
+$(".tabs").addEventListener("keydown",e=>{
+  if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+  const i=tabs.findIndex(t=>t.dataset.mode===ui.mode);
+  const n=tabs[(i+(e.key==="ArrowRight"?1:tabs.length-1))%tabs.length];
+  setMode(n.dataset.mode); n.focus(); e.preventDefault();
+});
+function setMode(m){ if(synth) synth.cancel(); ui.mode=m; saveUI(); renderTabs(); renderPanel(); }
+function renderTabs(){tabs.forEach(t=>{const on=t.dataset.mode===ui.mode;t.setAttribute("aria-selected",on);t.tabIndex=on?0:-1})}
+
+const panel = $("#panel");
+let cardQ=[], flipped=false, justFlipped=false, quiz=null;
+function resetRounds(){cardQ=[];flipped=false;quiz=null}
+function dock(html){ $("#dockInner").innerHTML=html||""; $("#dock").hidden=!html; }
+
+function dirToggle(label){
+  return `<div class="opts-row"><span>${label}</span><div class="tg" role="group" aria-label="${label}">
+    <button data-act="dir" data-dir="de-en" aria-pressed="${ui.dir==="de-en"}">German</button>
+    <button data-act="dir" data-dir="en-de" aria-pressed="${ui.dir==="en-de"}">English</button></div></div>`;
+}
+
+/* ---------- cards ---------- */
+function renderCards(){
+  if(!cardQ.length) cardQ=prioritized(active());
+  const t=cardQ[0], de2en=ui.dir==="de-en";
+  const front=de2en?t.de:t.en, back=de2en?t.en:t.de;
+  const fl=de2en?' lang="de"':"", bl=de2en?"":' lang="de"';
+  panel.innerHTML=`
+    ${dirToggle("Show first")}
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">${SECT[t.sec].en}</div>
+        <div class="card-desc">Word ${t.id} on the list</div>
+        <div class="card-action">${dots(t.id)}<button class="btn btn-outline btn-icon" data-act="speak" data-id="${t.id}" aria-label="Hear the German">${I.volume}</button></div>
+      </div>
+      <div class="card-content">
+        <button class="plate ${flipped?"is-back":""} ${justFlipped?"flip-in":""}" data-act="flip" aria-label="${flipped?"Turn the card back":"Turn the card"}">
+          ${flipped
+            ? `<span class="plate-main"${bl}>${esc(back)}</span><span class="plate-sub"${fl}>${esc(front)}</span>${t.hint?`<span class="plate-hint">${esc(t.hint)}</span>`:""}`
+            : `<span class="plate-main"${fl}>${esc(front)}</span><span class="plate-sub">Tap to turn the card</span>`}
+        </button>
+      </div>
+    </div>`;
+  justFlipped=false;
+  dock(flipped
+    ? `<button class="btn btn-outline btn-lg" data-act="again">${I.redo}Again<kbd>1</kbd></button><button class="btn btn-success btn-lg" data-act="got">${I.check}I knew it<kbd>2</kbd></button>`
+    : `<button class="btn btn-default btn-lg" data-act="flip">Show the meaning<kbd>Space</kbd></button>`);
+}
+function flip(){flipped=!flipped;justFlipped=!reduced();renderCards()}
+function answerCard(ok){
+  const t=cardQ.shift(); grade(t.id,ok); flipped=false;
+  if(ok) cardQ.push(t); else cardQ.splice(Math.min(3,cardQ.length),0,t);
+  renderCards();
+}
+
+/* ---------- quiz + listen ---------- */
+function optionsFor(t){
+  const banned=new Set([t.id,...(SAME[t.id]||[])]);
+  const sameSec=shuffle(TERMS.filter(x=>x.sec===t.sec&&!banned.has(x.id)));
+  const others=shuffle(TERMS.filter(x=>x.sec!==t.sec&&!banned.has(x.id)));
+  return shuffle([t,...[...sameSec,...others].slice(0,3)]);
+}
+function newQuiz(listen){
+  const items=prioritized(active()).slice(0,10).map(t=>({t,opts:optionsFor(t),pick:null,spoken:false,reveal:false}));
+  return {listen,items,i:0,score:0};
+}
+function renderQuiz(listen){
+  if(!quiz||quiz.listen!==listen) quiz=newQuiz(listen);
+  if(quiz.i>=quiz.items.length) return renderSummary();
+  const q=quiz.items[quiz.i], t=q.t, answered=q.pick!==null, right=q.pick===t.id;
+  const showDe = listen || ui.dir==="de-en";
+  const optText = o=> showDe ? `<span class="t">${esc(o.en)}</span>` : `<span class="t" lang="de">${esc(o.de)}</span>`;
+  const n=quiz.items.length;
+  let top, prompt;
+  if(listen){
+    top=`<div class="opts-row"><span>Speed</span><div class="tg" role="group" aria-label="Speed">
+      <button data-act="speed" data-slow="0" aria-pressed="${!ui.slow}">Normal</button><button data-act="speed" data-slow="1" aria-pressed="${ui.slow}">Slow</button></div></div>`;
+    prompt = synth
+      ? `<div class="play"><button class="big" data-act="speak" data-id="${t.id}" aria-label="Play again">${I.volume}</button>
+          ${answered||q.reveal?`<div class="said" lang="de">${esc(t.de)}</div>`:`<span>What did the examiner say?</span><button class="reveal" data-act="reveal">Show the German words</button>`}</div>`
+      : `<div class="empty-note">This browser can't speak German here. Try Chrome, Edge or Safari, or use the Quiz tab.</div>`;
+  } else {
+    top=dirToggle("Question in");
+    prompt=`<div class="plate compact"><span class="plate-main"${showDe?' lang="de"':""}>${esc(showDe?t.de:t.en)}</span><span class="plate-sub">${showDe?"What does this mean?":"Which is the German?"}</span></div>`;
+  }
+  panel.innerHTML=`${top}
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Question ${quiz.i+1} of ${n}</div>
+        <div class="card-desc">${SECT[t.sec].en}</div>
+        <div class="card-action"><span class="badge">${quiz.score} right</span></div>
+      </div>
+      <div class="qprogress" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${quiz.i+(answered?1:0)}"><i style="width:${(quiz.i+(answered?1:0))/n*100}%"></i></div>
+      <div class="card-content">
+        ${prompt}
+        <div class="opts">${q.opts.map((o,k)=>{
+          let cls="opt";
+          if(answered){ if(o.id===t.id) cls+=" is-correct"; else if(o.id===q.pick) cls+=" is-wrong"; else cls+=" dim"; }
+          const mark = o.id===t.id?I.check:I.x;
+          return `<button class="${cls}" data-act="pick" data-id="${o.id}" ${answered?"disabled":""}><span class="k">${k+1}</span>${optText(o)}<span class="mark">${mark}</span></button>`;
+        }).join("")}</div>
+        ${answered?`<div class="alert ${right?"good":"bad"}" role="status">${right?I.check:I.x}<div class="a-title">${right?"Right":"Not this time"}</div>
+          <div class="a-desc"><span class="de" lang="de">${esc(t.de)}</span> means ${esc(t.en)}.${t.hint?` ${esc(t.hint)}.`.replace(/\.\.$/,"."):""}</div></div>`:""}
+      </div>
+    </div>`;
+  dock(answered?`<button class="btn btn-default btn-lg" data-act="next">${quiz.i+1<n?"Next question":"See my score"}${I.arrow}<kbd>Enter</kbd></button>`:"");
+  if(answered){
+    const al=panel.querySelector(".alert");
+    if(al&&al.getBoundingClientRect().bottom>innerHeight-90) al.scrollIntoView({block:"nearest",behavior:reduced()?"auto":"smooth"});
+    const nb=$("#dock [data-act='next']"); if(nb) nb.focus({preventScroll:true});
+  }
+  if(listen && synth && !q.spoken){ q.spoken=true; speak(t.de); }
+}
+function pick(id){
+  const q=quiz.items[quiz.i]; if(q.pick!==null) return;
+  q.pick=id; const ok=id===q.t.id; if(ok) quiz.score++;
+  grade(q.t.id,ok); renderQuiz(quiz.listen);
+}
+function next(){quiz.i++;renderQuiz(quiz.listen);window.scrollTo({top:0});const f=panel.querySelector(".opt");if(f)f.focus({preventScroll:true})}
+function renderSummary(){
+  const n=quiz.items.length, missed=quiz.items.filter(q=>q.pick!==q.t.id);
+  const msg = quiz.score===n?"Every answer right. Try another round or add more sections."
+    : quiz.score>=n*0.7?"Good round. Look at the words you missed."
+    : "These words need more practice. Go through them in Cards, then try again.";
+  panel.innerHTML=`<div class="card">
+    <div class="card-header"><div class="card-title">Round finished</div><div class="card-desc">${msg}</div></div>
+    <div class="card-content"><div class="score">${quiz.score}<span> / ${n}</span></div></div>
+    ${missed.length?`<div class="card-content"><div class="card-title" style="margin-bottom:6px">Words to practise</div><ul class="missed">${missed.map(q=>`<li><div class="txt"><strong lang="de">${esc(q.t.de)}</strong><span>${esc(q.t.en)}</span></div><button class="btn btn-ghost btn-icon" data-act="speak" data-id="${q.t.id}" aria-label="Hear ${esc(q.t.de)}">${I.volume}</button></li>`).join("")}</ul></div>`:""}
+  </div>`;
+  dock(`<button class="btn btn-default btn-lg" data-act="newround">${I.redo}Start a new round</button>`);
+}
+
+/* ---------- word list ---------- */
+let armed=null;
+function renderList(){
+  panel.innerHTML=`<div class="card">
+    <div class="card-header"><div class="card-title">All words</div><div class="card-desc">Green dots show how well you know a word. Three dots means known.</div></div>
+    <div class="card-content">
+      <label for="q" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Find a word in German or English</label>
+      <div class="input-wrap">${I.search}<input class="input" id="q" type="search" placeholder="Find a word: Bremse, mirror, Ampel" autocomplete="off" enterkeyhint="search"></div>
+      <div id="listBody"></div>
+    </div>
+    <div class="card-footer" style="border-top:1px solid var(--border);padding-top:16px;justify-content:space-between">
+      <span class="muted" style="font-size:14px">Start again from zero</span>
+      <button class="btn btn-destructive-outline" data-act="reset">${I.trash}Reset progress</button>
+    </div>
+  </div>`;
+  $("#q").addEventListener("input",renderListBody);
+  renderListBody();
+  dock("");
+}
+function renderListBody(){
+  const q=($("#q")?.value||"").trim().toLowerCase();
+  const list=active().filter(t=>!q||t.de.toLowerCase().includes(q)||t.en.toLowerCase().includes(q));
+  if(!list.length){$("#listBody").innerHTML=`<div class="empty">No words match “${esc(q)}” in the sections you picked. Check the spelling or choose more sections.</div>`;return}
+  let html="",cur=0;
+  for(const t of list){
+    if(t.sec!==cur){cur=t.sec;html+=`<h2 class="sec-h">${SECT[cur].en} <small lang="de">${SECT[cur].de}</small></h2>`}
+    html+=`<div class="row"><div class="txt"><div class="de" lang="de">${esc(t.de)}</div><div class="en">${esc(t.en)}</div></div>${dots(t.id)}<button class="btn btn-ghost btn-icon" data-act="speak" data-id="${t.id}" aria-label="Hear ${esc(t.de)}">${I.volume}</button></div>`;
+  }
+  $("#listBody").innerHTML=html;
+}
+
+/* ---------- dispatch ---------- */
+function renderPanel(){
+  if(ui.mode==="cards") renderCards();
+  else if(ui.mode==="quiz") renderQuiz(false);
+  else if(ui.mode==="listen") renderQuiz(true);
+  else renderList();
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("#panel [data-act], #dock [data-act]"); if(!b) return;
+  const a=b.dataset.act;
+  if(a==="flip") flip();
+  else if(a==="got") answerCard(true);
+  else if(a==="again") answerCard(false);
+  else if(a==="speak") speak(BY_ID[b.dataset.id].de);
+  else if(a==="dir"){ if(ui.dir===b.dataset.dir) return; ui.dir=b.dataset.dir;saveUI();flipped=false;if(quiz&&!quiz.listen)quiz=null;renderPanel()}
+  else if(a==="pick") pick(b.dataset.id);
+  else if(a==="next") next();
+  else if(a==="newround"){quiz=newQuiz(quiz.listen);renderQuiz(quiz.listen);window.scrollTo({top:0})}
+  else if(a==="reveal"){quiz.items[quiz.i].reveal=true;renderQuiz(true)}
+  else if(a==="speed"){ui.slow=b.dataset.slow==="1";saveUI();renderQuiz(true);speak(quiz.items[quiz.i].t.de)}
+  else if(a==="reset"){
+    if(armed){clearTimeout(armed);armed=null;prog={};store(PKEY,prog);resetRounds();renderStats();renderChecks();renderList()}
+    else{b.innerHTML=`${I.trash}Tap again to reset`;b.className="btn btn-destructive";armed=setTimeout(()=>{armed=null;b.innerHTML=`${I.trash}Reset progress`;b.className="btn btn-destructive-outline"},3000)}
+  }
+});
+document.addEventListener("keydown",e=>{
+  if(e.target.matches("input,textarea")||e.metaKey||e.ctrlKey||e.altKey) return;
+  if(ui.mode==="cards"){
+    if((e.key===" "||e.key==="Enter")&&!flipped&&!e.target.closest(".tabs,.tg,.collapse,[data-act='speak']")){e.preventDefault();flip()}
+    else if(flipped&&e.key==="1") answerCard(false);
+    else if(flipped&&e.key==="2") answerCard(true);
+  } else if((ui.mode==="quiz"||ui.mode==="listen")&&quiz&&quiz.i<quiz.items.length){
+    const q=quiz.items[quiz.i];
+    if(q.pick===null && /^[1-4]$/.test(e.key)){const o=q.opts[+e.key-1];if(o)pick(o.id)}
+    else if(q.pick!==null && (e.key==="Enter"||e.key===" ")){e.preventDefault();next()}
+  }
+});
+
+renderStats(); renderChecks(); renderTabs(); renderPanel();
+</script>
+
+<script>
+if("serviceWorker" in navigator){
+  addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+}
+let deferredInstall=null;
+const installBtn=document.getElementById("installBtn");
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;installBtn.hidden=false});
+installBtn.addEventListener("click",async()=>{
+  if(!deferredInstall) return;
+  installBtn.hidden=true; deferredInstall.prompt();
+  try{await deferredInstall.userChoice}catch(e){}
+  deferredInstall=null;
+});
+addEventListener("appinstalled",()=>{installBtn.hidden=true});
+</script>
+</body>
+</html>
